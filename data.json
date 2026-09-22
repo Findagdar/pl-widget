@@ -1,5 +1,5 @@
 {
-  "_readme": "SEED/EXAMPLE data so the widget renders out of the box. Standings below reflect an early-season snapshot (~5 Sep 2026) pulled once by hand — run scripts/fetch_data.py (on a schedule, e.g. every 2 days) to overwrite this file with current numbers. Fields left out for a team (fixture/lineup/keyPlayer) make the widget fall back to a placeholder instead of guessing.",
+  "_readme": "SEED/EXAMPLE data so the widget renders out of the box. Standings are refreshed automatically (see generatedAt) by scripts/fetch_data.py on a schedule. 'fixtures' holds the full Matchweek 6 round (10-12 Oct 2026), one entry per team, curated by hand since fetch_fixtures() is still a stub — see README. Fields left out for a team (lineup/keyPlayer) make the widget fall back to a placeholder instead of guessing.",
   "generatedAt": "2026-09-22T15:16:43.776283+00:00",
   "standings": {
     "manchester-city": {
@@ -318,21 +318,165 @@
     }
   },
   "fixtures": {
-    "manchester-city": {
-      "opponent": "liverpool",
-      "home": false,
-      "date": "2026-10-11T15:30:00Z",
-      "venue": "Anfield",
+    "arsenal": {
+      "opponent": "leeds-united",
+      "home": true,
+      "date": "2026-10-10T12:30:00Z",
+      "venue": "Emirates Stadium",
       "competition": "Premier League",
-      "matchweek": 7
+      "matchweek": 6
+    },
+    "leeds-united": {
+      "opponent": "arsenal",
+      "home": false,
+      "date": "2026-10-10T12:30:00Z",
+      "venue": "Emirates Stadium",
+      "competition": "Premier League",
+      "matchweek": 6
+    },
+    "aston-villa": {
+      "opponent": "brentford",
+      "home": true,
+      "date": "2026-10-10T15:00:00Z",
+      "venue": "Villa Park",
+      "competition": "Premier League",
+      "matchweek": 6
+    },
+    "brentford": {
+      "opponent": "aston-villa",
+      "home": false,
+      "date": "2026-10-10T15:00:00Z",
+      "venue": "Villa Park",
+      "competition": "Premier League",
+      "matchweek": 6
+    },
+    "chelsea": {
+      "opponent": "bournemouth",
+      "home": true,
+      "date": "2026-10-10T15:00:00Z",
+      "venue": "Stamford Bridge",
+      "competition": "Premier League",
+      "matchweek": 6
+    },
+    "bournemouth": {
+      "opponent": "chelsea",
+      "home": false,
+      "date": "2026-10-10T15:00:00Z",
+      "venue": "Stamford Bridge",
+      "competition": "Premier League",
+      "matchweek": 6
+    },
+    "ipswich-town": {
+      "opponent": "fulham",
+      "home": true,
+      "date": "2026-10-10T15:00:00Z",
+      "venue": "Portman Road",
+      "competition": "Premier League",
+      "matchweek": 6
+    },
+    "fulham": {
+      "opponent": "ipswich-town",
+      "home": false,
+      "date": "2026-10-10T15:00:00Z",
+      "venue": "Portman Road",
+      "competition": "Premier League",
+      "matchweek": 6
+    },
+    "sunderland": {
+      "opponent": "brighton",
+      "home": true,
+      "date": "2026-10-10T15:00:00Z",
+      "venue": "Stadium of Light",
+      "competition": "Premier League",
+      "matchweek": 6
+    },
+    "brighton": {
+      "opponent": "sunderland",
+      "home": false,
+      "date": "2026-10-10T15:00:00Z",
+      "venue": "Stadium of Light",
+      "competition": "Premier League",
+      "matchweek": 6
+    },
+    "manchester-united": {
+      "opponent": "tottenham-hotspur",
+      "home": true,
+      "date": "2026-10-10T17:30:00Z",
+      "venue": "Old Trafford",
+      "competition": "Premier League",
+      "matchweek": 6
+    },
+    "tottenham-hotspur": {
+      "opponent": "manchester-united",
+      "home": false,
+      "date": "2026-10-10T17:30:00Z",
+      "venue": "Old Trafford",
+      "competition": "Premier League",
+      "matchweek": 6
+    },
+    "crystal-palace": {
+      "opponent": "nottingham-forest",
+      "home": true,
+      "date": "2026-10-11T14:00:00Z",
+      "venue": "Selhurst Park",
+      "competition": "Premier League",
+      "matchweek": 6
+    },
+    "nottingham-forest": {
+      "opponent": "crystal-palace",
+      "home": false,
+      "date": "2026-10-11T14:00:00Z",
+      "venue": "Selhurst Park",
+      "competition": "Premier League",
+      "matchweek": 6
+    },
+    "hull-city": {
+      "opponent": "everton",
+      "home": true,
+      "date": "2026-10-11T14:00:00Z",
+      "venue": "MKM Stadium",
+      "competition": "Premier League",
+      "matchweek": 6
+    },
+    "everton": {
+      "opponent": "hull-city",
+      "home": false,
+      "date": "2026-10-11T14:00:00Z",
+      "venue": "MKM Stadium",
+      "competition": "Premier League",
+      "matchweek": 6
     },
     "liverpool": {
       "opponent": "manchester-city",
       "home": true,
-      "date": "2026-10-11T15:30:00Z",
+      "date": "2026-10-11T16:30:00Z",
       "venue": "Anfield",
       "competition": "Premier League",
-      "matchweek": 7
+      "matchweek": 6
+    },
+    "manchester-city": {
+      "opponent": "liverpool",
+      "home": false,
+      "date": "2026-10-11T16:30:00Z",
+      "venue": "Anfield",
+      "competition": "Premier League",
+      "matchweek": 6
+    },
+    "coventry-city": {
+      "opponent": "newcastle-united",
+      "home": true,
+      "date": "2026-10-12T20:00:00Z",
+      "venue": "CBS Arena",
+      "competition": "Premier League",
+      "matchweek": 6
+    },
+    "newcastle-united": {
+      "opponent": "coventry-city",
+      "home": false,
+      "date": "2026-10-12T20:00:00Z",
+      "venue": "CBS Arena",
+      "competition": "Premier League",
+      "matchweek": 6
     }
   },
   "lineups": {
