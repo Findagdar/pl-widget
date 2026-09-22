@@ -25,6 +25,12 @@ jobs:
       - run: pip install requests beautifulsoup4 pandas lxml
 
       - run: python scripts/fetch_data.py
+        env:
+          # Optional but recommended: a free token from football-data.org
+          # (see README) gets you real fixtures + more reliable standings.
+          # Without it, the script still runs and falls back to scraping
+          # Wikipedia for standings only, leaving fixtures untouched.
+          FOOTBALL_DATA_API_KEY: ${{ secrets.FOOTBALL_DATA_API_KEY }}
 
       - name: Commit updated data.json
         run: |
