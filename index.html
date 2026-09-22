@@ -126,6 +126,29 @@
 </div>
 
 <script>
+/* ============================================================
+   PL MATCHDAY WIDGET
+   Generic head-to-head widget for any two Premier League teams.
+   Reads ./teams.json (static club metadata) and ./data.json
+   (standings/fixtures/lineups, meant to be refreshed on a cron —
+   see scripts/fetch_data.py and README.md).
+
+   URL params:
+     ?home=<slug>&away=<slug>   pick the two teams explicitly
+     ?team=<slug>                show that team's next fixture (looked
+                                  up from data.json's fixtures block)
+     ?theme=dark|light           force a theme instead of following
+                                  the embedding page / OS setting
+     ?density=compact|cozy       tighten or loosen spacing/type size
+                                  (default is a middle "normal" size)
+     ?maxwidth=520                cap the widget's own max-width (px)
+
+   Sizing: the widget is fluid and reflows to whatever width the
+   iframe is given (no fixed pixel width baked in). Height follows
+   content, so give the iframe a generous fixed height OR listen for
+   the postMessage below to auto-resize the iframe to fit exactly.
+   ============================================================ */
+
 const params = new URLSearchParams(location.search);
 const app = document.getElementById('app');
 
@@ -139,6 +162,7 @@ if (density === 'compact' || density === 'cozy') {
 const maxwidth = params.get('maxwidth');
 if (maxwidth && !isNaN(parseInt(maxwidth, 10))) {
   document.querySelector('.wrap')?.style.setProperty('max-width', maxwidth + 'px');
+  // wrap isn't in the DOM yet at parse time in some browsers; set again after render too.
 }
 
 function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -146,13 +170,14 @@ function fmtDate(iso){
   try{
     const d = new Date(iso);
     return d.toLocaleDateString(undefined, { weekday:'short', day:'numeric', month:'short' }) + ' · ' +
-           d.toLocaleTimeString(undefined, { hour:'2-digit', minute:'2-digit' });
+           d.toLocaleTimeString(undefined, { hour:'2-digit', minute:'2-digit', timeZoneName:'short' });
   } catch(e){ return iso; }
 }
 
 function pip(r){ return `<div class="pip ${r.toLowerCase()}">${r}</div>`; }
 
 function formationRows(l){
+  // l = { formation, gk, def[], mid[], am[], fw, bench[] } — returns rows GK -> FW (bottom-up order)
   return [ [l.gk], l.def, l.mid, l.am, [l.fw] ];
 }
 
@@ -165,8 +190,10 @@ function renderPitch(homeSlug, awaySlug, teams, lineups){
   if (!H || !A) {
     return `<div class="placeholder">Confirmed lineups aren't in yet for this fixture — check back closer to kick-off.</div>`;
   }
-  const awayRows = formationRows(A);
-  const homeRows = formationRows(H).slice().reverse();
+  // Away team goes on top attacking down, home team on the bottom attacking up,
+  // with both strikers meeting at the halfway line.
+  const awayRows = formationRows(A);               // [GK, DEF, MID, AM, FW] top -> down
+  const homeRows = formationRows(H).slice().reverse(); // [FW, AM, MID, DEF, GK] top -> down (mirrors into the bottom half)
 
   const awayHtml = awayRows.map(row =>
     `<div class="prow">${row.map((p,i)=>pitchChip(p,'away', row===awayRows[0])).join('')}</div>`
@@ -242,6 +269,7 @@ async function main(){
     return;
   }
 
+  // Resolve which two teams to show.
   let homeSlug = params.get('home');
   let awaySlug = params.get('away');
   const teamParam = params.get('team');
@@ -252,6 +280,7 @@ async function main(){
     else { homeSlug = fx.opponent; awaySlug = teamParam; }
   }
   if (!homeSlug || !awaySlug) {
+    // fall back to the first fixture pair present in data.json
     const firstSlug = Object.keys(data.fixtures || {})[0];
     if (firstSlug) {
       const fx = data.fixtures[firstSlug];
@@ -283,6 +312,8 @@ async function main(){
         <div class="pips">${(s.form||[]).map(pip).join('')}</div>
       </div>` : `<div class="cmp-col ${side}"><div class="placeholder" style="padding:10px 4px;">No standings data yet</div></div>`;
 
+  // Away on the left, home on the right — matches the standings cards and
+  // key-men cards above, so the same team doesn't appear to swap sides.
   const metricRow = (label, av, hv) => {
     const total = (Number(hv)||0) + (Number(av)||0) || 1;
     const ap = Math.round((Number(av)||0) / total * 100);
@@ -351,6 +382,8 @@ async function main(){
     document.querySelector('.wrap').style.maxWidth = maxwidth + 'px';
   }
 
+  // Let an embedding page auto-size the iframe if it wants to.
+  // Parent-side listener example is in README.md.
   function postHeight(){
     try {
       parent.postMessage({ type: 'pl-widget-resize', height: document.documentElement.scrollHeight }, '*');
