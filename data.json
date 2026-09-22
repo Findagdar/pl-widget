@@ -1,6 +1,6 @@
 {
   "_readme": "SEED/EXAMPLE data so the widget renders out of the box. Standings are refreshed automatically (see generatedAt) by scripts/fetch_data.py on a schedule. 'fixtures' holds the full Matchweek 6 round (10-12 Oct 2026), one entry per team, curated by hand since fetch_fixtures() is still a stub — see README. Fields left out for a team (lineup/keyPlayer) make the widget fall back to a placeholder instead of guessing.",
-  "generatedAt": "2026-09-22T16:55:40.601826+00:00",
+  "generatedAt": "2026-09-22T17:13:37.768749+00:00",
   "standings": {
     "manchester-city": {
       "pos": 1,
@@ -324,7 +324,8 @@
       "date": "2026-10-10T11:30:00Z",
       "venue": "Emirates Stadium",
       "competition": "Premier League",
-      "matchweek": 6
+      "matchweek": 6,
+      "matchId": 560593
     },
     "leeds-united": {
       "opponent": "arsenal",
@@ -332,7 +333,8 @@
       "date": "2026-10-10T11:30:00Z",
       "venue": "Emirates Stadium",
       "competition": "Premier League",
-      "matchweek": 6
+      "matchweek": 6,
+      "matchId": 560593
     },
     "sunderland": {
       "opponent": "brighton",
@@ -340,7 +342,8 @@
       "date": "2026-10-10T14:00:00Z",
       "venue": "Stadium of Light",
       "competition": "Premier League",
-      "matchweek": 6
+      "matchweek": 6,
+      "matchId": 560592
     },
     "brighton": {
       "opponent": "sunderland",
@@ -348,7 +351,8 @@
       "date": "2026-10-10T14:00:00Z",
       "venue": "Stadium of Light",
       "competition": "Premier League",
-      "matchweek": 6
+      "matchweek": 6,
+      "matchId": 560592
     },
     "chelsea": {
       "opponent": "bournemouth",
@@ -356,7 +360,8 @@
       "date": "2026-10-10T14:00:00Z",
       "venue": "Stamford Bridge",
       "competition": "Premier League",
-      "matchweek": 6
+      "matchweek": 6,
+      "matchId": 560595
     },
     "bournemouth": {
       "opponent": "chelsea",
@@ -364,7 +369,8 @@
       "date": "2026-10-10T14:00:00Z",
       "venue": "Stamford Bridge",
       "competition": "Premier League",
-      "matchweek": 6
+      "matchweek": 6,
+      "matchId": 560595
     },
     "ipswich-town": {
       "opponent": "fulham",
@@ -372,7 +378,8 @@
       "date": "2026-10-10T14:00:00Z",
       "venue": "Portman Road",
       "competition": "Premier League",
-      "matchweek": 6
+      "matchweek": 6,
+      "matchId": 560599
     },
     "fulham": {
       "opponent": "ipswich-town",
@@ -380,7 +387,8 @@
       "date": "2026-10-10T14:00:00Z",
       "venue": "Portman Road",
       "competition": "Premier League",
-      "matchweek": 6
+      "matchweek": 6,
+      "matchId": 560599
     },
     "aston-villa": {
       "opponent": "brentford",
@@ -388,7 +396,8 @@
       "date": "2026-10-10T14:00:00Z",
       "venue": "Villa Park",
       "competition": "Premier League",
-      "matchweek": 6
+      "matchweek": 6,
+      "matchId": 560601
     },
     "brentford": {
       "opponent": "aston-villa",
@@ -396,7 +405,8 @@
       "date": "2026-10-10T14:00:00Z",
       "venue": "Villa Park",
       "competition": "Premier League",
-      "matchweek": 6
+      "matchweek": 6,
+      "matchId": 560601
     },
     "manchester-united": {
       "opponent": "tottenham-hotspur",
@@ -404,7 +414,8 @@
       "date": "2026-10-10T16:30:00Z",
       "venue": "Old Trafford",
       "competition": "Premier League",
-      "matchweek": 6
+      "matchweek": 6,
+      "matchId": 560600
     },
     "tottenham-hotspur": {
       "opponent": "manchester-united",
@@ -412,7 +423,8 @@
       "date": "2026-10-10T16:30:00Z",
       "venue": "Old Trafford",
       "competition": "Premier League",
-      "matchweek": 6
+      "matchweek": 6,
+      "matchId": 560600
     },
     "hull-city": {
       "opponent": "everton",
@@ -420,7 +432,8 @@
       "date": "2026-10-11T13:00:00Z",
       "venue": "MKM Stadium",
       "competition": "Premier League",
-      "matchweek": 6
+      "matchweek": 6,
+      "matchId": 560594
     },
     "everton": {
       "opponent": "hull-city",
@@ -428,7 +441,8 @@
       "date": "2026-10-11T13:00:00Z",
       "venue": "MKM Stadium",
       "competition": "Premier League",
-      "matchweek": 6
+      "matchweek": 6,
+      "matchId": 560594
     },
     "crystal-palace": {
       "opponent": "nottingham-forest",
@@ -436,7 +450,8 @@
       "date": "2026-10-11T13:00:00Z",
       "venue": "Selhurst Park",
       "competition": "Premier League",
-      "matchweek": 6
+      "matchweek": 6,
+      "matchId": 560596
     },
     "nottingham-forest": {
       "opponent": "crystal-palace",
@@ -444,7 +459,8 @@
       "date": "2026-10-11T13:00:00Z",
       "venue": "Selhurst Park",
       "competition": "Premier League",
-      "matchweek": 6
+      "matchweek": 6,
+      "matchId": 560596
     },
     "liverpool": {
       "opponent": "manchester-city",
@@ -452,7 +468,8 @@
       "date": "2026-10-11T15:30:00Z",
       "venue": "Anfield",
       "competition": "Premier League",
-      "matchweek": 6
+      "matchweek": 6,
+      "matchId": 560598
     },
     "manchester-city": {
       "opponent": "liverpool",
@@ -460,7 +477,8 @@
       "date": "2026-10-11T15:30:00Z",
       "venue": "Anfield",
       "competition": "Premier League",
-      "matchweek": 6
+      "matchweek": 6,
+      "matchId": 560598
     },
     "coventry-city": {
       "opponent": "newcastle-united",
@@ -468,7 +486,8 @@
       "date": "2026-10-12T19:00:00Z",
       "venue": "CBS Arena",
       "competition": "Premier League",
-      "matchweek": 6
+      "matchweek": 6,
+      "matchId": 560597
     },
     "newcastle-united": {
       "opponent": "coventry-city",
@@ -476,7 +495,258 @@
       "date": "2026-10-12T19:00:00Z",
       "venue": "CBS Arena",
       "competition": "Premier League",
-      "matchweek": 6
+      "matchweek": 6,
+      "matchId": 560597
+    }
+  },
+  "headToHead": {
+    "arsenal": {
+      "played": 10,
+      "homeWins": 0,
+      "draws": 1,
+      "awayWins": 0,
+      "avgGoals": 3.2,
+      "bttsPct": 50,
+      "lastMeeting": {
+        "date": "2026-01-31T15:00:00Z",
+        "home": "Leeds United FC",
+        "away": "Arsenal FC",
+        "homeScore": 0,
+        "awayScore": 4,
+        "competition": "Premier League"
+      }
+    },
+    "sunderland": {
+      "played": 9,
+      "homeWins": 0,
+      "draws": 2,
+      "awayWins": 0,
+      "avgGoals": 2.3,
+      "bttsPct": 0,
+      "lastMeeting": {
+        "date": "2026-03-14T15:00:00Z",
+        "home": "Sunderland AFC",
+        "away": "Brighton & Hove Albion FC",
+        "homeScore": 0,
+        "awayScore": 1,
+        "competition": "Premier League"
+      }
+    },
+    "chelsea": {
+      "played": 10,
+      "homeWins": 0,
+      "draws": 5,
+      "awayWins": 0,
+      "avgGoals": 2.3,
+      "bttsPct": 56,
+      "lastMeeting": {
+        "date": "2025-12-30T19:30:00Z",
+        "home": "Chelsea FC",
+        "away": "AFC Bournemouth",
+        "homeScore": 2,
+        "awayScore": 2,
+        "competition": "Premier League"
+      }
+    },
+    "ipswich-town": {
+      "played": 10,
+      "homeWins": 0,
+      "draws": 4,
+      "awayWins": 0,
+      "avgGoals": 2.9,
+      "bttsPct": 100,
+      "lastMeeting": {
+        "date": "2025-01-05T14:00:00Z",
+        "home": "Fulham FC",
+        "away": "Ipswich Town FC",
+        "homeScore": 2,
+        "awayScore": 2,
+        "competition": "Premier League"
+      }
+    },
+    "aston-villa": {
+      "played": 10,
+      "homeWins": 0,
+      "draws": 2,
+      "awayWins": 0,
+      "avgGoals": 3.3,
+      "bttsPct": 56,
+      "lastMeeting": {
+        "date": "2026-02-01T14:00:00Z",
+        "home": "Aston Villa FC",
+        "away": "Brentford FC",
+        "homeScore": 0,
+        "awayScore": 1,
+        "competition": "Premier League"
+      }
+    },
+    "manchester-united": {
+      "played": 10,
+      "homeWins": 0,
+      "draws": 3,
+      "awayWins": 0,
+      "avgGoals": 3.0,
+      "bttsPct": 38,
+      "lastMeeting": {
+        "date": "2026-02-07T12:30:00Z",
+        "home": "Manchester United FC",
+        "away": "Tottenham Hotspur FC",
+        "homeScore": 2,
+        "awayScore": 0,
+        "competition": "Premier League"
+      }
+    },
+    "hull-city": {
+      "played": 10,
+      "homeWins": 0,
+      "draws": 2,
+      "awayWins": 0,
+      "avgGoals": 3.7,
+      "bttsPct": null,
+      "lastMeeting": null
+    },
+    "crystal-palace": {
+      "played": 10,
+      "homeWins": 0,
+      "draws": 6,
+      "awayWins": 0,
+      "avgGoals": 1.8,
+      "bttsPct": 62,
+      "lastMeeting": {
+        "date": "2026-02-01T14:00:00Z",
+        "home": "Nottingham Forest FC",
+        "away": "Crystal Palace FC",
+        "homeScore": 1,
+        "awayScore": 1,
+        "competition": "Premier League"
+      }
+    },
+    "liverpool": {
+      "played": 10,
+      "homeWins": 0,
+      "draws": 2,
+      "awayWins": 0,
+      "avgGoals": 2.9,
+      "bttsPct": 50,
+      "lastMeeting": {
+        "date": "2026-02-08T16:30:00Z",
+        "home": "Liverpool FC",
+        "away": "Manchester City FC",
+        "homeScore": 1,
+        "awayScore": 2,
+        "competition": "Premier League"
+      }
+    },
+    "coventry-city": {
+      "played": 10,
+      "homeWins": 0,
+      "draws": 2,
+      "awayWins": 0,
+      "avgGoals": 3.7,
+      "bttsPct": null,
+      "lastMeeting": null
+    }
+  },
+  "topScorers": {
+    "manchester-city": {
+      "name": "Erling Haaland",
+      "goals": 5,
+      "assists": 0
+    },
+    "liverpool": {
+      "name": "Alexander Isak",
+      "goals": 4,
+      "assists": 0
+    },
+    "arsenal": {
+      "name": "Bukayo Saka",
+      "goals": 3,
+      "assists": 0
+    },
+    "bournemouth": {
+      "name": "Marcus Tavernier",
+      "goals": 3,
+      "assists": 0
+    },
+    "chelsea": {
+      "name": "João Pedro",
+      "goals": 3,
+      "assists": 3
+    },
+    "brighton": {
+      "name": "Pascal Groß",
+      "goals": 3,
+      "assists": 3
+    },
+    "brentford": {
+      "name": "Kevin Schade",
+      "goals": 3,
+      "assists": 0
+    },
+    "manchester-united": {
+      "name": "Bruno Fernandes",
+      "goals": 3,
+      "assists": 1
+    },
+    "sunderland": {
+      "name": "Brian Brobbey",
+      "goals": 3,
+      "assists": 0
+    },
+    "ipswich-town": {
+      "name": "Emersonn",
+      "goals": 2,
+      "assists": 1
+    },
+    "everton": {
+      "name": "Thierno Barry",
+      "goals": 2,
+      "assists": 0
+    },
+    "newcastle-united": {
+      "name": "Anthony Elanga",
+      "goals": 2,
+      "assists": 0
+    },
+    "fulham": {
+      "name": "Joshua King",
+      "goals": 2,
+      "assists": 0
+    },
+    "leeds-united": {
+      "name": "Dominic Calvert-Lewin",
+      "goals": 2,
+      "assists": 1
+    },
+    "crystal-palace": {
+      "name": "Tyrick Mitchell",
+      "goals": 2,
+      "assists": 0
+    },
+    "hull-city": {
+      "name": "Mohamed Belloumi",
+      "goals": 2,
+      "assists": 2
+    },
+    "nottingham-forest": {
+      "name": "Dan Ndoye",
+      "goals": 1,
+      "assists": 0
+    },
+    "aston-villa": {
+      "name": "Alysson",
+      "goals": 1,
+      "assists": 0
+    },
+    "tottenham-hotspur": {
+      "name": "Conor Gallagher",
+      "goals": 1,
+      "assists": 0
+    },
+    "coventry-city": {
+      "name": "Jay Dasilva",
+      "goals": 1,
+      "assists": 0
     }
   },
   "lineups": {
