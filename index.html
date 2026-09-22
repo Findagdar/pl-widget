@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PL Matchday Widget</title>
+<style>
+  :root{
+    color-scheme: light dark;
+    --bg:#F3F6F9; --surface:#FFFFFF; --surface-2:#ECF1F6; --border:#D9E1E9;
+    --text:#101820; --text-dim:#5B6B78;
+    --home:#1868A6;
+    --away:#C8272D;
+    --gold:#9A6A0C; --gold-soft:#F7EAD2;
+    --win:#137A56; --draw:#8A6D1F; --loss:#B23744;
+    --pitch:#3C9A63; --pitch-2:#358A58; --pitch-line:rgba(255,255,255,.6);
+    --shadow:0 1px 2px rgba(16,24,32,.06);
+    --pad: 14px;      /* density control, see body[data-density] below */
+    --font: 13px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0A1420; --surface:#101C2B; --surface-2:#152437; --border:#213348;
+      --text:#EAF1F8; --text-dim:#8BA0B4;
+      --gold:#E7B24C; --gold-soft:rgba(231,178,76,.14);
+      --win:#3ED28F; --draw:#E7C15A;
+      --pitch:#123B26; --pitch-2:#0F3220; --pitch-line:rgba(255,255,255,.32);
+      --shadow:0 1px 2px rgba(0,0,0,.4);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0A1420; --surface:#101C2B; --surface-2:#152437; --border:#213348;
+    --text:#EAF1F8; --text-dim:#8BA0B4;
+    --gold:#E7B24C; --gold-soft:rgba(231,178,76,.14);
+    --win:#3ED28F; --draw:#E7C15A;
+    --pitch:#123B26; --pitch-2:#0F3220; --pitch-line:rgba(255,255,255,.32);
+    --shadow:0 1px 2px rgba(0,0,0,.4);
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{ background:var(--bg); color:var(--text); font-family:"Manrope",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; font-size:var(--font); }
+  body[data-density="compact"]{ --pad:9px; --font:11.5px; }
+  body[data-density="cozy"]{ --pad:16px; --font:14px; }
+  h1,h2,.num{ font-family:"Barlow Condensed","Manrope",sans-serif; }
+  img{ max-width:100%; }
+  [hidden]{ display:none!important; }
+
+  .wrap{ max-width:640px; margin:0 auto; padding-inline:14px; padding-block:14px 22px; display:flex; flex-direction:column; gap:calc(var(--pad) * 0.85); }
+  .card{ background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:var(--pad) calc(var(--pad) + 2px); box-shadow:var(--shadow); }
+  .eyebrow{ font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--text-dim); }
+
+  /* fixture header */
+  .fx-teams{ display:flex; align-items:center; justify-content:center; gap:12px; }
+  .fx-team{ flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; text-align:center; min-width:0; }
+  .fx-crest{ width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:11px; font-family:"Barlow Condensed",sans-serif; box-shadow:var(--shadow); flex-shrink:0; }
+  .fx-team .nm{ font-size:12.5px; font-weight:700; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+  .fx-vs{ font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:15px; color:var(--text-dim); flex-shrink:0; }
+  .fx-meta{ text-align:center; font-size:11px; color:var(--text-dim); margin-top:6px; }
+
+  /* compare strip */
+  .cmp{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .cmp-col{ display:flex; flex-direction:column; align-items:center; gap:5px; padding:8px 4px; border-radius:9px; }
+  .cmp-col.home{ background:color-mix(in srgb, var(--home) 14%, var(--surface)); }
+  .cmp-col.away{ background:color-mix(in srgb, var(--away) 14%, var(--surface)); }
+  .cmp-pos{ font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:19px; font-variant-numeric:tabular-nums; }
+  .cmp-col.home .cmp-pos{ color:var(--home); }
+  .cmp-col.away .cmp-pos{ color:var(--away); }
+  .cmp-sub{ font-size:10.5px; color:var(--text-dim); }
+  .cmp-rec{ font-size:11px; font-weight:600; }
+  .pips{ display:flex; gap:3px; }
+  .pip{ width:17px; height:17px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:700; color:#fff; }
+  .pip.w{ background:var(--win); } .pip.d{ background:var(--draw); } .pip.l{ background:var(--loss); }
+
+  /* metric bars */
+  .metrics{ display:flex; flex-direction:column; gap:7px; }
+  .mrow{ display:grid; grid-template-columns:34px 1fr 34px; align-items:center; gap:8px; font-size:11px; }
+  .mrow .mv{ font-weight:700; font-variant-numeric:tabular-nums; text-align:center; }
+  .mrow .mv.home{ color:var(--home); } .mrow .mv.away{ color:var(--away); }
+  .mbar{ display:flex; height:6px; border-radius:4px; overflow:hidden; background:var(--surface-2); }
+  .mbar > span{ display:block; height:100%; }
+  .mbar .b-home{ background:var(--home); } .mbar .b-away{ background:var(--away); }
+  .mlabel{ text-align:center; font-size:9.5px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.05em; margin-top:-2px; }
+
+  /* pitch */
+  .pitch{ border-radius:10px; background:repeating-linear-gradient(180deg,var(--pitch) 0 12.5%,var(--pitch-2) 12.5% 25%); position:relative; padding:10px 6px; display:flex; flex-direction:column; gap:6px; overflow:hidden; }
+  .pitch::after{ content:""; position:absolute; left:6%; right:6%; top:50%; height:0; border-top:1.5px solid var(--pitch-line); }
+  .pitch::before{ content:""; position:absolute; left:50%; top:50%; width:64px; height:64px; border:1.5px solid var(--pitch-line); border-radius:50%; transform:translate(-50%,-50%); }
+  .prow{ display:flex; justify-content:space-evenly; gap:2px; position:relative; z-index:1; }
+  .pchip{ display:flex; flex-direction:column; align-items:center; gap:2px; width:56px; }
+  .pshirt{ width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:10.5px; box-shadow:0 1px 3px rgba(0,0,0,.35); color:#fff; }
+  .pshirt.gk{ background:var(--gold)!important; color:#2b1c00; }
+  .pname{ font-size:9px; font-weight:700; color:#fff; text-align:center; line-height:1.1; text-shadow:0 1px 3px rgba(0,0,0,.55); }
+  .pitch-tag{ position:absolute; font-size:9px; color:rgba(255,255,255,.85); text-transform:uppercase; letter-spacing:.06em; font-weight:700; z-index:1; }
+  .pitch-tag.top{ top:6px; left:8px; } .pitch-tag.bot{ bottom:6px; left:8px; }
+  .bench-cols{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px; }
+  .bench-cols .bc-label{ font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--text-dim); margin-bottom:4px; }
+  .bench-list{ display:flex; flex-wrap:wrap; gap:4px; }
+  .bench-chip{ font-size:10px; background:var(--surface-2); border-radius:6px; padding:3px 6px; color:var(--text-dim); }
+  .placeholder{ font-size:11.5px; color:var(--text-dim); text-align:center; padding:18px 8px; background:var(--surface-2); border-radius:9px; }
+
+  /* key men */
+  .km-grid{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .km{ border-radius:9px; padding:9px 10px; }
+  .km.home{ background:color-mix(in srgb, var(--home) 14%, var(--surface)); }
+  .km.away{ background:color-mix(in srgb, var(--away) 14%, var(--surface)); }
+  .km-name{ font-weight:700; font-size:12px; }
+  .km-role{ font-size:10px; color:var(--text-dim); margin-bottom:4px; }
+  .km-fact{ font-size:11px; line-height:1.4; }
+
+  /* angles */
+  .angle-list{ display:flex; flex-direction:column; gap:6px; }
+  .angle{ display:flex; gap:8px; align-items:flex-start; }
+  .angle .an-num{ font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:14px; color:var(--gold); flex-shrink:0; min-width:16px; }
+  .angle .an-txt{ font-size:11.5px; line-height:1.4; }
+  .angle .an-txt b{ font-weight:700; }
+
+  .footer{ font-size:10px; color:var(--text-dim); line-height:1.5; text-align:center; }
+  .err{ font-size:12px; color:var(--loss); text-align:center; padding:24px 12px; }
+</style>
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
+</head>
+<body>
+<div class="wrap" id="app">
+  <div class="card err">Loading matchday widget…</div>
+</div>
+
+<script>
+const params = new URLSearchParams(location.search);
+const app = document.getElementById('app');
+
+if (params.get('theme') === 'dark' || params.get('theme') === 'light') {
+  document.documentElement.setAttribute('data-theme', params.get('theme'));
+}
+const density = params.get('density');
+if (density === 'compact' || density === 'cozy') {
+  document.body.setAttribute('data-density', density);
+}
+const maxwidth = params.get('maxwidth');
+if (maxwidth && !isNaN(parseInt(maxwidth, 10))) {
+  document.querySelector('.wrap')?.style.setProperty('max-width', maxwidth + 'px');
+}
+
+function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function fmtDate(iso){
+  try{
+    const d = new Date(iso);
+    return d.toLocaleDateString(undefined, { weekday:'short', day:'numeric', month:'short' }) + ' · ' +
+           d.toLocaleTimeString(undefined, { hour:'2-digit', minute:'2-digit' });
+  } catch(e){ return iso; }
+}
+
+function pip(r){ return `<div class="pip ${r.toLowerCase()}">${r}</div>`; }
+
+function formationRows(l){
+  return [ [l.gk], l.def, l.mid, l.am, [l.fw] ];
+}
+
+function pitchChip(p, side, isGk){
+  return `<div class="pchip"><div class="pshirt ${side}${isGk?' gk':''}">${esc(p.num)}</div><div class="pname">${esc(p.name)}</div></div>`;
+}
+
+function renderPitch(homeSlug, awaySlug, teams, lineups){
+  const H = lineups[homeSlug], A = lineups[awaySlug];
+  if (!H || !A) {
+    return `<div class="placeholder">Confirmed lineups aren't in yet for this fixture — check back closer to kick-off.</div>`;
+  }
+  const awayRows = formationRows(A);
+  const homeRows = formationRows(H).slice().reverse();
+
+  const awayHtml = awayRows.map(row =>
+    `<div class="prow">${row.map((p,i)=>pitchChip(p,'away', row===awayRows[0])).join('')}</div>`
+  ).join('');
+  const homeHtml = homeRows.map((row, idx) =>
+    `<div class="prow"${idx===0?' style="margin-top:6px;"':''}>${row.map(p=>pitchChip(p,'home', idx===homeRows.length-1)).join('')}</div>`
+  ).join('');
+
+  return `
+    <div class="pitch">
+      <span class="pitch-tag top">${esc(teams[awaySlug].name)} attack ↓</span>
+      ${awayHtml}
+      ${homeHtml}
+      <span class="pitch-tag bot">${esc(teams[homeSlug].name)} attack ↑</span>
+    </div>
+    <div class="bench-cols">
+      <div><div class="bc-label">${esc(teams[awaySlug].short)} bench</div><div class="bench-list">${(A.bench||[]).map(n=>`<span class="bench-chip">${esc(n)}</span>`).join('')}</div></div>
+      <div><div class="bc-label">${esc(teams[homeSlug].short)} bench</div><div class="bench-list">${(H.bench||[]).map(n=>`<span class="bench-chip">${esc(n)}</span>`).join('')}</div></div>
+    </div>`;
+}
+
+function trailingStreak(form){
+  if (!form || !form.length) return null;
+  const last = form[form.length-1];
+  let n = 0;
+  for (let i = form.length-1; i>=0 && form[i]===last; i--) n++;
+  return { result: last, n };
+}
+
+function buildAngles(homeSlug, awaySlug, teams, standings, fx){
+  const H = standings[homeSlug], A = standings[awaySlug];
+  const angles = [];
+  const hName = teams[homeSlug].name, aName = teams[awaySlug].name;
+
+  if (H && A) {
+    const hppg = (H.pts / Math.max(H.pld,1)).toFixed(2);
+    const appg = (A.pts / Math.max(A.pld,1)).toFixed(2);
+    if (hppg === appg) {
+      angles.push(`<b>Form edge:</b> dead level on points-per-game so far (${hName} and ${aName} both at ${hppg} ppg).`);
+    } else {
+      const better = hppg > appg ? hName : aName;
+      angles.push(`<b>Form edge:</b> ${esc(better)} are taking more points per game this season (${hName} ${hppg} vs ${aName} ${appg} ppg).`);
+    }
+
+    const hgpg = (H.gf / Math.max(H.pld,1)).toFixed(1);
+    const agpg = (A.gf / Math.max(A.pld,1)).toFixed(1);
+    angles.push(`<b>Goals trend:</b> ${esc(hName)} average ${hgpg} scored per game, ${esc(aName)} average ${agpg} — a lean toward the side that's created more.`);
+
+    const hDefRate = (H.ga / Math.max(H.pld,1)).toFixed(1);
+    const aDefRate = (A.ga / Math.max(A.pld,1)).toFixed(1);
+    const leakier = hDefRate >= aDefRate ? hName : aName;
+    angles.push(`<b>Defensive line:</b> ${esc(leakier)} are conceding more often per game (${hName} ${hDefRate} vs ${aName} ${aDefRate}) — a BTTS-friendly signal if the trend holds.`);
+
+    const hs = trailingStreak(H.form), as = trailingStreak(A.form);
+    if (hs && hs.n >= 3 && hs.result !== 'D') angles.push(`<b>${esc(hName)}</b> are unbeaten/on a run of ${hs.n} ${hs.result==='W'?'wins':'without a loss'} coming in.`);
+    if (as && as.n >= 3 && as.result !== 'D') angles.push(`<b>${esc(aName)}</b> are unbeaten/on a run of ${as.n} ${as.result==='W'?'wins':'without a loss'} coming in.`);
+  }
+  if (fx) {
+    angles.push(`<b>Context:</b> Matchweek ${esc(fx.matchweek ?? '?')}, ${esc(fx.competition || 'Premier League')} at ${esc(fx.venue || 'TBC')}.`);
+  }
+  return angles.slice(0, 5);
+}
+
+async function main(){
+  let teams, data;
+  try {
+    [teams, data] = await Promise.all([
+      fetch('./teams.json').then(r => { if(!r.ok) throw new Error('teams.json ' + r.status); return r.json(); }),
+      fetch('./data.json').then(r => { if(!r.ok) throw new Error('data.json ' + r.status); return r.json(); }),
+    ]);
+  } catch (e) {
+    app.innerHTML = `<div class="card err">Couldn't load widget data (${esc(e.message)}). Make sure teams.json and data.json are served next to this page.</div>`;
+    return;
+  }
+
+  let homeSlug = params.get('home');
+  let awaySlug = params.get('away');
+  const teamParam = params.get('team');
+
+  if ((!homeSlug || !awaySlug) && teamParam && data.fixtures?.[teamParam]) {
+    const fx = data.fixtures[teamParam];
+    if (fx.home) { homeSlug = teamParam; awaySlug = fx.opponent; }
+    else { homeSlug = fx.opponent; awaySlug = teamParam; }
+  }
+  if (!homeSlug || !awaySlug) {
+    const firstSlug = Object.keys(data.fixtures || {})[0];
+    if (firstSlug) {
+      const fx = data.fixtures[firstSlug];
+      if (fx.home) { homeSlug = firstSlug; awaySlug = fx.opponent; }
+      else { homeSlug = fx.opponent; awaySlug = firstSlug; }
+    }
+  }
+
+  if (!homeSlug || !awaySlug || !teams[homeSlug] || !teams[awaySlug]) {
+    app.innerHTML = `<div class="card err">No fixture to show. Pass ?home=&lt;slug&gt;&amp;away=&lt;slug&gt; or ?team=&lt;slug&gt; — see teams.json for valid slugs.</div>`;
+    return;
+  }
+
+  const home = teams[homeSlug], away = teams[awaySlug];
+  document.documentElement.style.setProperty('--home', home.primary);
+  document.documentElement.style.setProperty('--home-dark', home.dark);
+  document.documentElement.style.setProperty('--away', away.primary);
+  document.documentElement.style.setProperty('--away-dark', away.dark);
+
+  const H = data.standings?.[homeSlug], A = data.standings?.[awaySlug];
+  const fx = data.fixtures?.[homeSlug] || data.fixtures?.[awaySlug];
+  const km = data.keyPlayer || {};
+
+  const cmpCol = (slug, s, side) => s ? `
+      <div class="cmp-col ${side}">
+        <div class="cmp-pos">${s.pos}${s.pos===1?'st':s.pos===2?'nd':s.pos===3?'rd':'th'}</div>
+        <div class="cmp-sub">${s.pts} pts · ${s.gd>=0?'+':''}${s.gd} GD</div>
+        <div class="cmp-rec">${s.w}W–${s.d}D–${s.l}L</div>
+        <div class="pips">${(s.form||[]).map(pip).join('')}</div>
+      </div>` : `<div class="cmp-col ${side}"><div class="placeholder" style="padding:10px 4px;">No standings data yet</div></div>`;
+
+  const metricRow = (label, av, hv) => {
+    const total = (Number(hv)||0) + (Number(av)||0) || 1;
+    const ap = Math.round((Number(av)||0) / total * 100);
+    return `<div>
+      <div class="mrow"><span class="mv away">${av}</span><div class="mbar"><span class="b-away" style="width:${ap}%"></span><span class="b-home" style="width:${100-ap}%"></span></div><span class="mv home">${hv}</span></div>
+      <div class="mlabel">${label}</div>
+    </div>`;
+  };
+
+  const kmCard = (slug, side) => km[slug] ? `
+    <div class="km ${side}">
+      <div class="km-name">${esc(km[slug].name)}</div>
+      <div class="km-role">${esc(teams[slug].name)} · ${esc(km[slug].role)}</div>
+      <div class="km-fact">${esc(km[slug].fact)}</div>
+    </div>` : `<div class="km ${side}"><div class="km-fact">Season standout TBC — check squad news closer to kick-off.</div></div>`;
+
+  const angles = buildAngles(homeSlug, awaySlug, teams, data.standings || {}, fx);
+
+  app.innerHTML = `
+    <div class="card fx-head">
+      <div class="eyebrow" style="text-align:center;">${esc(fx?.competition || 'Premier League')}${fx?.matchweek ? ' · Matchweek ' + esc(fx.matchweek) : ''}</div>
+      <div class="fx-teams" style="margin-top:6px;">
+        <div class="fx-team"><div class="fx-crest" style="background:linear-gradient(155deg,var(--away),var(--away-dark));">${esc(away.initials)}</div><div class="nm">${esc(away.name)}</div></div>
+        <div class="fx-vs">VS</div>
+        <div class="fx-team"><div class="fx-crest" style="background:linear-gradient(155deg,var(--home),var(--home-dark));">${esc(home.initials)}</div><div class="nm">${esc(home.name)}</div></div>
+      </div>
+      <div class="fx-meta">${esc(fx?.venue || 'Venue TBC')}${fx?.date ? ' · ' + esc(fmtDate(fx.date)) : ''}</div>
+    </div>
+
+    <div class="card">
+      <div class="cmp">${cmpCol(awaySlug, A, 'away')}${cmpCol(homeSlug, H, 'home')}</div>
+    </div>
+
+    ${H && A ? `
+    <div class="card">
+      <div class="eyebrow" style="margin-bottom:8px;">Season so far (${H.pld}–${A.pld} games)</div>
+      <div class="metrics">
+        ${metricRow('Points', A.pts, H.pts)}
+        ${metricRow('Goals for', A.gf, H.gf)}
+        ${metricRow('Goals against', A.ga, H.ga)}
+      </div>
+    </div>` : ''}
+
+    <div class="card">
+      <div class="eyebrow" style="margin-bottom:8px;">Projected lineups</div>
+      ${renderPitch(homeSlug, awaySlug, teams, data.lineups || {})}
+    </div>
+
+    <div class="card">
+      <div class="eyebrow" style="margin-bottom:8px;">Key men</div>
+      <div class="km-grid">${kmCard(awaySlug,'away')}${kmCard(homeSlug,'home')}</div>
+    </div>
+
+    ${angles.length ? `
+    <div class="card">
+      <div class="eyebrow" style="margin-bottom:8px;">Punter angles</div>
+      <div class="angle-list">${angles.map((a,i)=>`<div class="angle"><span class="an-num">${i+1}</span><span class="an-txt">${a}</span></div>`).join('')}</div>
+    </div>` : ''}
+
+    <div class="footer">
+      Data refreshed ${esc(new Date(data.generatedAt).toLocaleString())} · verify lineups and current odds before kick-off.
+    </div>
+  `;
+
+  if (maxwidth && !isNaN(parseInt(maxwidth, 10))) {
+    document.querySelector('.wrap').style.maxWidth = maxwidth + 'px';
+  }
+
+  function postHeight(){
+    try {
+      parent.postMessage({ type: 'pl-widget-resize', height: document.documentElement.scrollHeight }, '*');
+    } catch(e) {}
+  }
+  postHeight();
+  new ResizeObserver(postHeight).observe(document.body);
+}
+
+main();
+</script>
+</body>
+</html>
