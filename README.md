@@ -7,8 +7,9 @@ hosted anywhere and dropped into any sportsbook page as an `<iframe>`.
 
 ```
 pl-widget/
-├── index.html                    the widget itself (self-contained HTML/CSS/JS)
-├── teams.json                    static metadata for all 20 clubs (colors, short codes)
+├── index.html                    single-fixture widget (self-contained HTML/CSS/JS)
+├── matches.html                  lists every upcoming fixture's widget, soonest first
+├── teams.json                    static metadata for all 20 clubs (colors, short codes, venue)
 ├── data.json                     standings / fixtures / lineups — this is what gets refreshed
 ├── scripts/fetch_data.py         the refresh script
 └── .github/workflows/refresh.yml optional: runs the script every 2 days via GitHub Actions
@@ -81,7 +82,23 @@ So one build covers all 20 clubs and every possible pairing; you just
 change the query string per placement (e.g. generate the `<iframe src>`
 dynamically from whatever match a given page is about).
 
-## 4. Keep the data current
+## 4. Show every upcoming fixture at once
+
+`matches.html` lists a widget for every fixture currently in `data.json`,
+soonest kickoff first, grouped by day, each one collapsed into a summary
+row you tap to expand (auto-resized, lazy-loaded — collapsed rows cost
+nothing). It reads the exact same `teams.json`/`data.json` as `index.html`,
+so it always reflects whatever fixtures the refresh script last pulled —
+nothing extra to maintain.
+
+```html
+<iframe src="https://YOUR-DOMAIN/pl-widget/matches.html" width="420" height="900" style="border:0;" loading="lazy" title="Upcoming Premier League fixtures"></iframe>
+```
+
+Same `&density=` and `&theme=` params as `index.html` apply, and pass
+through to each embedded widget automatically.
+
+## 5. Keep the data current
 
 `data.json` ships with an early-season **example snapshot** so the widget
 renders immediately — it is not live data. Two ways to refresh it every 2
@@ -102,17 +119,39 @@ python scripts/fetch_data.py --dry-run # prints instead, for checking output
 ```
 then sync `data.json` to wherever you're hosting.
 
+### Set up football-data.org (recommended, free, ~1 minute)
+
+Standings work out of the box with zero setup (see below), but **fixtures
+only auto-update if you connect a free [football-data.org](https://www.football-data.org/)
+API key** — it's the only source here structured enough to reliably parse
+fixture dates/venues/matchdays without fragile scraping, and it's genuinely
+free for Premier League data (10 requests/minute, no card required):
+
+1. Register at <https://www.football-data.org/client/register> and copy
+   the API token it gives you.
+2. In your GitHub repo: **Settings → Secrets and variables → Actions →
+   New repository secret**, name it `FOOTBALL_DATA_API_KEY`, paste the
+   token, save. The workflow already reads it — nothing else to change.
+3. Running locally: `export FOOTBALL_DATA_API_KEY=your-token-here` before
+   `python scripts/fetch_data.py`.
+
+Without a key, the script still runs on its schedule and still refreshes
+standings (via the Wikipedia fallback below) — only the fixtures step is
+skipped, leaving whatever fixtures are already in `data.json` untouched.
+
 ### What the script actually refreshes — and what it doesn't
 
-- **Standings** (position, W-D-L, goals, points): scraped from Wikipedia's
-  season table. This is the reliable part — plain HTML table, no anti-bot
-  wall.
-- **Fixtures** (next opponent/date/venue): left as a stub
-  (`fetch_fixtures()` in the script) for you to fill in against whatever
-  source you're comfortable scraping — check its `robots.txt` and terms
-  first. A free structured alternative worth considering instead of
-  scraping: [football-data.org](https://www.football-data.org/) (has a
-  no-cost API tier).
+- **Standings** (position, W-D-L, goals, points, form): pulled from
+  football-data.org when `FOOTBALL_DATA_API_KEY` is set — structured,
+  reliable, includes a real `form` strip. Falls back to scraping
+  Wikipedia's season table (no key needed, but no form data) if the key
+  is missing or the API request fails, so this never blocks the widget
+  from working.
+- **Fixtures** (opponent/date/venue/matchweek, all 20 clubs): pulled from
+  football-data.org's matches endpoint — the next full unplayed
+  matchday, every fixture in it. Requires the API key above; without it,
+  fixtures are left exactly as they were in the previous `data.json`
+  rather than being wiped or guessed.
 - **Lineups**: **not** automated. Confirmed lineups typically only appear
   about an hour before kickoff, so a once-per-2-days job can't chase them
   reliably — the widget is built to fall back to a "check back closer to
