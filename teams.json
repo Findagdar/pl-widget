@@ -1,0 +1,22 @@
+{
+  "arsenal":            { "name": "Arsenal",                 "short": "ARS", "initials": "ARS",  "primary": "#EF0107", "dark": "#063672" },
+  "aston-villa":        { "name": "Aston Villa",              "short": "AVL", "initials": "AVL",  "primary": "#670E36", "dark": "#3D0A20" },
+  "bournemouth":        { "name": "Bournemouth",               "short": "BOU", "initials": "BOU",  "primary": "#DA291C", "dark": "#000000" },
+  "brentford":          { "name": "Brentford",                 "short": "BRE", "initials": "BRE",  "primary": "#D20000", "dark": "#7A0000" },
+  "brighton":           { "name": "Brighton & Hove Albion",    "short": "BHA", "initials": "BHA",  "primary": "#0057B8", "dark": "#00285C" },
+  "chelsea":            { "name": "Chelsea",                   "short": "CHE", "initials": "CHE",  "primary": "#034694", "dark": "#001A3D" },
+  "coventry-city":      { "name": "Coventry City",              "short": "COV", "initials": "COV",  "primary": "#78D0F2", "dark": "#211E1F" },
+  "crystal-palace":     { "name": "Crystal Palace",             "short": "CRY", "initials": "CRY",  "primary": "#1B458F", "dark": "#0F275A" },
+  "everton":            { "name": "Everton",                    "short": "EVE", "initials": "EVE",  "primary": "#003399", "dark": "#001A4D" },
+  "fulham":             { "name": "Fulham",                     "short": "FUL", "initials": "FUL",  "primary": "#000000", "dark": "#CC0000" },
+  "hull-city":          { "name": "Hull City",                  "short": "HUL", "initials": "HUL",  "primary": "#F18A00", "dark": "#000000" },
+  "ipswich-town":       { "name": "Ipswich Town",                "short": "IPS", "initials": "IPS",  "primary": "#0044A9", "dark": "#00265C" },
+  "leeds-united":       { "name": "Leeds United",                "short": "LEE", "initials": "LEE",  "primary": "#1D428A", "dark": "#0E2450" },
+  "liverpool":          { "name": "Liverpool",                   "short": "LIV", "initials": "LIV",  "primary": "#C8102E", "dark": "#7A0A1C" },
+  "manchester-city":    { "name": "Manchester City",             "short": "MCI", "initials": "MCFC", "primary": "#1868A6", "dark": "#0B4E7A" },
+  "manchester-united":  { "name": "Manchester United",           "short": "MUN", "initials": "MUN",  "primary": "#DA291C", "dark": "#7A0000" },
+  "newcastle-united":   { "name": "Newcastle United",            "short": "NEW", "initials": "NUFC", "primary": "#000000", "dark": "#7F1B1B" },
+  "nottingham-forest":  { "name": "Nottingham Forest",           "short": "NFO", "initials": "NFO",  "primary": "#DD0000", "dark": "#7A0000" },
+  "sunderland":         { "name": "Sunderland",                  "short": "SUN", "initials": "SUN",  "primary": "#EB172B", "dark": "#8A0E1A" },
+  "tottenham-hotspur":  { "name": "Tottenham Hotspur",           "short": "TOT", "initials": "TOT",  "primary": "#132257", "dark": "#0A1230" }
+}
