@@ -223,7 +223,7 @@ function trailingStreak(form){
   return { result: last, n };
 }
 
-function buildAngles(homeSlug, awaySlug, teams, standings, fx){
+function buildAngles(homeSlug, awaySlug, teams, standings, fx, h2h){
   const H = standings[homeSlug], A = standings[awaySlug];
   const angles = [];
   const hName = teams[homeSlug].name, aName = teams[awaySlug].name;
@@ -251,10 +251,28 @@ function buildAngles(homeSlug, awaySlug, teams, standings, fx){
     if (hs && hs.n >= 3 && hs.result !== 'D') angles.push(`<b>${esc(hName)}</b> are unbeaten/on a run of ${hs.n} ${hs.result==='W'?'wins':'without a loss'} coming in.`);
     if (as && as.n >= 3 && as.result !== 'D') angles.push(`<b>${esc(aName)}</b> are unbeaten/on a run of ${as.n} ${as.result==='W'?'wins':'without a loss'} coming in.`);
   }
-  if (fx) {
-    angles.push(`<b>Context:</b> Matchweek ${esc(fx.matchweek ?? '?')}, ${esc(fx.competition || 'Premier League')} at ${esc(fx.venue || 'TBC')}.`);
+
+  // Bookie-oriented angles pulled from head-to-head history, when available.
+  if (h2h && h2h.played) {
+    angles.push(`<b>Head-to-head:</b> ${esc(hName)} have ${h2h.homeWins} win${h2h.homeWins===1?'':'s'}, ${esc(aName)} have ${h2h.awayWins} win${h2h.awayWins===1?'':'s'}, with ${h2h.draws} draw${h2h.draws===1?'':'s'} across their last ${h2h.played} meeting${h2h.played===1?'':'s'}.`);
+    if (h2h.avgGoals != null) {
+      const lean = h2h.avgGoals >= 2.5 ? 'over' : 'under';
+      angles.push(`<b>H2H goals trend:</b> these two have averaged ${h2h.avgGoals} goals per meeting historically — a lean toward ${lean} 2.5.`);
+    }
+    if (h2h.bttsPct != null) {
+      angles.push(`<b>BTTS angle:</b> both teams have scored in ${h2h.bttsPct}% of their last ${h2h.played} meeting${h2h.played===1?'':'s'}.`);
+    }
+    if (h2h.lastMeeting) {
+      const lm = h2h.lastMeeting;
+      angles.push(`<b>Fun fact:</b> they last met ${fmtDate(lm.date)} — ${esc(lm.home)} ${lm.homeScore}–${lm.awayScore} ${esc(lm.away)} (${esc(lm.competition)}).`);
+    }
   }
-  return angles.slice(0, 5);
+
+  const trimmed = angles.slice(0, 7);
+  if (fx) {
+    trimmed.push(`<b>Context:</b> Matchweek ${esc(fx.matchweek ?? '?')}, ${esc(fx.competition || 'Premier League')} at ${esc(fx.venue || 'TBC')}.`);
+  }
+  return trimmed;
 }
 
 async function main(){
@@ -303,6 +321,7 @@ async function main(){
   const H = data.standings?.[homeSlug], A = data.standings?.[awaySlug];
   const fx = data.fixtures?.[homeSlug] || data.fixtures?.[awaySlug];
   const km = data.keyPlayer || {};
+  const h2h = data.headToHead?.[homeSlug];
 
   const cmpCol = (slug, s, side) => s ? `
       <div class="cmp-col ${side}">
@@ -323,14 +342,29 @@ async function main(){
     </div>`;
   };
 
-  const kmCard = (slug, side) => km[slug] ? `
+  const kmCard = (slug, side) => {
+    if (km[slug]) {
+      return `
     <div class="km ${side}">
       <div class="km-name">${esc(km[slug].name)}</div>
       <div class="km-role">${esc(teams[slug].name)} · ${esc(km[slug].role)}</div>
       <div class="km-fact">${esc(km[slug].fact)}</div>
-    </div>` : `<div class="km ${side}"><div class="km-fact">Season standout TBC — check squad news closer to kick-off.</div></div>`;
+    </div>`;
+    }
+    const ts = data.topScorers?.[slug];
+    if (ts) {
+      const assistTxt = ts.assists ? `, ${ts.assists} assist${ts.assists===1?'':'s'}` : '';
+      return `
+    <div class="km ${side}">
+      <div class="km-name">${esc(ts.name)}</div>
+      <div class="km-role">${esc(teams[slug].name)} · Top scorer</div>
+      <div class="km-fact">${ts.goals} goal${ts.goals===1?'':'s'} this season${assistTxt}.</div>
+    </div>`;
+    }
+    return `<div class="km ${side}"><div class="km-fact">Season standout TBC — check squad news closer to kick-off.</div></div>`;
+  };
 
-  const angles = buildAngles(homeSlug, awaySlug, teams, data.standings || {}, fx);
+  const angles = buildAngles(homeSlug, awaySlug, teams, data.standings || {}, fx, h2h);
 
   app.innerHTML = `
     <div class="card fx-head">
@@ -355,6 +389,17 @@ async function main(){
         ${metricRow('Goals for', A.gf, H.gf)}
         ${metricRow('Goals against', A.ga, H.ga)}
       </div>
+    </div>` : ''}
+
+    ${h2h ? `
+    <div class="card">
+      <div class="eyebrow" style="margin-bottom:8px;">Head-to-head (last ${h2h.played})</div>
+      <div class="cmp">
+        <div class="cmp-col away"><div class="cmp-pos">${h2h.awayWins}</div><div class="cmp-sub">${esc(away.name)} wins</div></div>
+        <div class="cmp-col home"><div class="cmp-pos">${h2h.homeWins}</div><div class="cmp-sub">${esc(home.name)} wins</div></div>
+      </div>
+      <div class="mlabel" style="margin-top:8px;">${h2h.draws} draw${h2h.draws===1?'':'s'}${h2h.avgGoals!=null?' · avg '+h2h.avgGoals+' goals/game':''}${h2h.bttsPct!=null?' · BTTS in '+h2h.bttsPct+'% of meetings':''}</div>
+      ${h2h.lastMeeting ? `<div class="fx-meta" style="margin-top:8px;">Last meeting: ${esc(h2h.lastMeeting.home)} ${h2h.lastMeeting.homeScore}–${h2h.lastMeeting.awayScore} ${esc(h2h.lastMeeting.away)} · ${esc(h2h.lastMeeting.competition)}, ${esc(fmtDate(h2h.lastMeeting.date))}</div>` : ''}
     </div>` : ''}
 
     <div class="card">
