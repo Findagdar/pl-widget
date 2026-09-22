@@ -1,58 +1,474 @@
 {
   "_readme": "SEED/EXAMPLE data so the widget renders out of the box. Standings below reflect an early-season snapshot (~5 Sep 2026) pulled once by hand — run scripts/fetch_data.py (on a schedule, e.g. every 2 days) to overwrite this file with current numbers. Fields left out for a team (fixture/lineup/keyPlayer) make the widget fall back to a placeholder instead of guessing.",
-  "generatedAt": "2026-09-05T00:00:00Z",
-
+  "generatedAt": "2026-09-22T15:16:43.776283+00:00",
   "standings": {
-    "manchester-city":   { "pos": 1,  "pld": 3, "w": 3, "d": 0, "l": 0, "gf": 7, "ga": 2, "gd": 5,  "pts": 9, "form": ["W","W","W"] },
-    "arsenal":           { "pos": 2,  "pld": 2, "w": 2, "d": 0, "l": 0, "gf": 4, "ga": 0, "gd": 4,  "pts": 6, "form": ["W","W"] },
-    "hull-city":         { "pos": 3,  "pld": 2, "w": 2, "d": 0, "l": 0, "gf": 3, "ga": 0, "gd": 3,  "pts": 6, "form": ["W","W"] },
-    "chelsea":           { "pos": 4,  "pld": 2, "w": 2, "d": 0, "l": 0, "gf": 7, "ga": 5, "gd": 2,  "pts": 6, "form": ["W","W"] },
-    "brentford":         { "pos": 5,  "pld": 3, "w": 1, "d": 2, "l": 0, "gf": 5, "ga": 2, "gd": 3,  "pts": 5, "form": ["D","D","W"] },
-    "liverpool":         { "pos": 6,  "pld": 3, "w": 1, "d": 2, "l": 0, "gf": 6, "ga": 4, "gd": 2,  "pts": 5, "form": ["D","D","W"] },
-    "newcastle-united":  { "pos": 7,  "pld": 3, "w": 1, "d": 2, "l": 0, "gf": 6, "ga": 4, "gd": 2,  "pts": 5, "form": ["D","W","D"] },
-    "leeds-united":      { "pos": 8,  "pld": 3, "w": 1, "d": 2, "l": 0, "gf": 3, "ga": 2, "gd": 1,  "pts": 5, "form": ["D","D","W"] },
-    "brighton":          { "pos": 9,  "pld": 3, "w": 1, "d": 1, "l": 1, "gf": 8, "ga": 5, "gd": 3,  "pts": 4, "form": ["W","L","D"] },
-    "everton":           { "pos": 10, "pld": 2, "w": 1, "d": 1, "l": 0, "gf": 3, "ga": 1, "gd": 2,  "pts": 4, "form": ["D","W"] },
-    "sunderland":        { "pos": 11, "pld": 3, "w": 1, "d": 1, "l": 1, "gf": 3, "ga": 3, "gd": 0,  "pts": 4, "form": ["W","D","L"] },
-    "manchester-united": { "pos": 12, "pld": 2, "w": 1, "d": 0, "l": 1, "gf": 5, "ga": 4, "gd": 1,  "pts": 3, "form": ["L","W"] },
-    "crystal-palace":    { "pos": 13, "pld": 3, "w": 1, "d": 0, "l": 2, "gf": 4, "ga": 8, "gd": -4, "pts": 3, "form": ["W","L","L"] },
-    "ipswich-town":      { "pos": 14, "pld": 3, "w": 1, "d": 0, "l": 2, "gf": 4, "ga": 8, "gd": -4, "pts": 3, "form": ["L","W","L"] },
-    "bournemouth":       { "pos": 15, "pld": 3, "w": 0, "d": 2, "l": 1, "gf": 4, "ga": 5, "gd": -1, "pts": 2, "form": ["D","L","D"] },
-    "nottingham-forest": { "pos": 16, "pld": 3, "w": 0, "d": 2, "l": 1, "gf": 2, "ga": 3, "gd": -1, "pts": 2, "form": ["D","D","L"] },
-    "tottenham-hotspur": { "pos": 17, "pld": 3, "w": 0, "d": 1, "l": 2, "gf": 0, "ga": 5, "gd": -5, "pts": 1, "form": ["L","D","L"] },
-    "fulham":            { "pos": 18, "pld": 3, "w": 0, "d": 0, "l": 3, "gf": 4, "ga": 7, "gd": -3, "pts": 0, "form": ["L","L","L"] },
-    "coventry-city":     { "pos": 19, "pld": 3, "w": 0, "d": 0, "l": 3, "gf": 0, "ga": 5, "gd": -5, "pts": 0, "form": ["L","L","L"] },
-    "aston-villa":       { "pos": 20, "pld": 2, "w": 0, "d": 0, "l": 2, "gf": 0, "ga": 5, "gd": -5, "pts": 0, "form": ["L","L"] }
+    "manchester-city": {
+      "pos": 1,
+      "pld": 5,
+      "w": 5,
+      "d": 0,
+      "l": 0,
+      "gf": 13,
+      "ga": 5,
+      "gd": 8,
+      "pts": 15,
+      "form": [
+        "W",
+        "W",
+        "W"
+      ]
+    },
+    "arsenal": {
+      "pos": 2,
+      "pld": 5,
+      "w": 4,
+      "d": 0,
+      "l": 1,
+      "gf": 8,
+      "ga": 4,
+      "gd": 4,
+      "pts": 12,
+      "form": [
+        "W",
+        "W"
+      ]
+    },
+    "brighton": {
+      "pos": 3,
+      "pld": 5,
+      "w": 3,
+      "d": 1,
+      "l": 1,
+      "gf": 16,
+      "ga": 5,
+      "gd": 11,
+      "pts": 10,
+      "form": [
+        "W",
+        "L",
+        "D"
+      ]
+    },
+    "brentford": {
+      "pos": 4,
+      "pld": 5,
+      "w": 2,
+      "d": 3,
+      "l": 0,
+      "gf": 10,
+      "ga": 4,
+      "gd": 6,
+      "pts": 9,
+      "form": [
+        "D",
+        "D",
+        "W"
+      ]
+    },
+    "leeds-united": {
+      "pos": 5,
+      "pld": 5,
+      "w": 2,
+      "d": 3,
+      "l": 0,
+      "gf": 7,
+      "ga": 3,
+      "gd": 4,
+      "pts": 9,
+      "form": [
+        "D",
+        "D",
+        "W"
+      ]
+    },
+    "liverpool": {
+      "pos": 6,
+      "pld": 5,
+      "w": 2,
+      "d": 3,
+      "l": 0,
+      "gf": 7,
+      "ga": 4,
+      "gd": 3,
+      "pts": 9,
+      "form": [
+        "D",
+        "D",
+        "W"
+      ]
+    },
+    "everton": {
+      "pos": 7,
+      "pld": 5,
+      "w": 2,
+      "d": 3,
+      "l": 0,
+      "gf": 6,
+      "ga": 3,
+      "gd": 3,
+      "pts": 9,
+      "form": [
+        "D",
+        "W"
+      ]
+    },
+    "hull-city": {
+      "pos": 8,
+      "pld": 5,
+      "w": 2,
+      "d": 2,
+      "l": 1,
+      "gf": 6,
+      "ga": 4,
+      "gd": 2,
+      "pts": 8,
+      "form": [
+        "W",
+        "W"
+      ]
+    },
+    "newcastle-united": {
+      "pos": 9,
+      "pld": 5,
+      "w": 2,
+      "d": 2,
+      "l": 1,
+      "gf": 9,
+      "ga": 9,
+      "gd": 0,
+      "pts": 8,
+      "form": [
+        "D",
+        "W",
+        "D"
+      ]
+    },
+    "chelsea": {
+      "pos": 10,
+      "pld": 5,
+      "w": 2,
+      "d": 1,
+      "l": 2,
+      "gf": 10,
+      "ga": 12,
+      "gd": -2,
+      "pts": 7,
+      "form": [
+        "W",
+        "W"
+      ]
+    },
+    "ipswich-town": {
+      "pos": 11,
+      "pld": 5,
+      "w": 2,
+      "d": 0,
+      "l": 3,
+      "gf": 7,
+      "ga": 11,
+      "gd": -4,
+      "pts": 6,
+      "form": [
+        "L",
+        "W",
+        "L"
+      ]
+    },
+    "manchester-united": {
+      "pos": 12,
+      "pld": 5,
+      "w": 1,
+      "d": 2,
+      "l": 2,
+      "gf": 8,
+      "ga": 8,
+      "gd": 0,
+      "pts": 5,
+      "form": [
+        "L",
+        "W"
+      ]
+    },
+    "nottingham-forest": {
+      "pos": 13,
+      "pld": 5,
+      "w": 1,
+      "d": 2,
+      "l": 2,
+      "gf": 4,
+      "ga": 5,
+      "gd": -1,
+      "pts": 5,
+      "form": [
+        "D",
+        "D",
+        "L"
+      ]
+    },
+    "sunderland": {
+      "pos": 14,
+      "pld": 5,
+      "w": 1,
+      "d": 1,
+      "l": 3,
+      "gf": 6,
+      "ga": 10,
+      "gd": -4,
+      "pts": 4,
+      "form": [
+        "W",
+        "D",
+        "L"
+      ]
+    },
+    "crystal-palace": {
+      "pos": 15,
+      "pld": 5,
+      "w": 1,
+      "d": 1,
+      "l": 3,
+      "gf": 6,
+      "ga": 11,
+      "gd": -5,
+      "pts": 4,
+      "form": [
+        "W",
+        "L",
+        "L"
+      ]
+    },
+    "aston-villa": {
+      "pos": 16,
+      "pld": 5,
+      "w": 1,
+      "d": 1,
+      "l": 3,
+      "gf": 4,
+      "ga": 9,
+      "gd": -5,
+      "pts": 4,
+      "form": [
+        "L",
+        "L"
+      ]
+    },
+    "bournemouth": {
+      "pos": 17,
+      "pld": 5,
+      "w": 0,
+      "d": 3,
+      "l": 2,
+      "gf": 6,
+      "ga": 8,
+      "gd": -2,
+      "pts": 3,
+      "form": [
+        "D",
+        "L",
+        "D"
+      ]
+    },
+    "coventry-city": {
+      "pos": 18,
+      "pld": 5,
+      "w": 1,
+      "d": 0,
+      "l": 4,
+      "gf": 1,
+      "ga": 10,
+      "gd": -9,
+      "pts": 3,
+      "form": [
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "fulham": {
+      "pos": 19,
+      "pld": 5,
+      "w": 0,
+      "d": 2,
+      "l": 3,
+      "gf": 5,
+      "ga": 8,
+      "gd": -3,
+      "pts": 2,
+      "form": [
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "tottenham-hotspur": {
+      "pos": 20,
+      "pld": 5,
+      "w": 0,
+      "d": 2,
+      "l": 3,
+      "gf": 2,
+      "ga": 8,
+      "gd": -6,
+      "pts": 2,
+      "form": [
+        "L",
+        "D",
+        "L"
+      ]
+    }
   },
-
   "fixtures": {
-    "manchester-city": { "opponent": "liverpool",       "home": false, "date": "2026-10-11T15:30:00Z", "venue": "Anfield",        "competition": "Premier League", "matchweek": 7 },
-    "liverpool":        { "opponent": "manchester-city", "home": true,  "date": "2026-10-11T15:30:00Z", "venue": "Anfield",        "competition": "Premier League", "matchweek": 7 }
+    "manchester-city": {
+      "opponent": "liverpool",
+      "home": false,
+      "date": "2026-10-11T15:30:00Z",
+      "venue": "Anfield",
+      "competition": "Premier League",
+      "matchweek": 7
+    },
+    "liverpool": {
+      "opponent": "manchester-city",
+      "home": true,
+      "date": "2026-10-11T15:30:00Z",
+      "venue": "Anfield",
+      "competition": "Premier League",
+      "matchweek": 7
+    }
   },
-
   "lineups": {
     "manchester-city": {
       "formation": "4-2-3-1",
-      "gk":  { "num": "1",  "name": "Donnarumma" },
-      "def": [ { "num": "24", "name": "Gvardiol" }, { "num": "6", "name": "Guéhi" }, { "num": "3", "name": "Dias" }, { "num": "27", "name": "Nunes" } ],
-      "mid": [ { "num": "5",  "name": "Anderson" }, { "num": "17", "name": "Fernández" } ],
-      "am":  [ { "num": "-",  "name": "Ndiaye" }, { "num": "10", "name": "Cherki" }, { "num": "-", "name": "Semenyo" } ],
-      "fw":  { "num": "9",  "name": "Haaland" },
-      "bench": ["Rulli", "Khusanov", "Lewis", "O'Reilly", "Aït-Nouri", "Doku"]
+      "gk": {
+        "num": "1",
+        "name": "Donnarumma"
+      },
+      "def": [
+        {
+          "num": "24",
+          "name": "Gvardiol"
+        },
+        {
+          "num": "6",
+          "name": "Guéhi"
+        },
+        {
+          "num": "3",
+          "name": "Dias"
+        },
+        {
+          "num": "27",
+          "name": "Nunes"
+        }
+      ],
+      "mid": [
+        {
+          "num": "5",
+          "name": "Anderson"
+        },
+        {
+          "num": "17",
+          "name": "Fernández"
+        }
+      ],
+      "am": [
+        {
+          "num": "-",
+          "name": "Ndiaye"
+        },
+        {
+          "num": "10",
+          "name": "Cherki"
+        },
+        {
+          "num": "-",
+          "name": "Semenyo"
+        }
+      ],
+      "fw": {
+        "num": "9",
+        "name": "Haaland"
+      },
+      "bench": [
+        "Rulli",
+        "Khusanov",
+        "Lewis",
+        "O'Reilly",
+        "Aït-Nouri",
+        "Doku"
+      ]
     },
     "liverpool": {
       "formation": "4-2-3-1",
-      "gk":  { "num": "1",  "name": "Alisson" },
-      "def": [ { "num": "4", "name": "Van Dijk" }, { "num": "-", "name": "Jacquet" }, { "num": "-", "name": "Araújo" }, { "num": "44", "name": "Kerkez" } ],
-      "mid": [ { "num": "8",  "name": "Szoboszlai" }, { "num": "10", "name": "Mac Allister" } ],
-      "am":  [ { "num": "-",  "name": "Barcola" }, { "num": "-", "name": "Wirtz" }, { "num": "20", "name": "Gakpo" } ],
-      "fw":  { "num": "9",  "name": "Isak" },
-      "bench": ["Mamardashvili", "Gomez", "Tsimikas", "Gravenberch", "Chiesa", "Ekitike"]
+      "gk": {
+        "num": "1",
+        "name": "Alisson"
+      },
+      "def": [
+        {
+          "num": "4",
+          "name": "Van Dijk"
+        },
+        {
+          "num": "-",
+          "name": "Jacquet"
+        },
+        {
+          "num": "-",
+          "name": "Araújo"
+        },
+        {
+          "num": "44",
+          "name": "Kerkez"
+        }
+      ],
+      "mid": [
+        {
+          "num": "8",
+          "name": "Szoboszlai"
+        },
+        {
+          "num": "10",
+          "name": "Mac Allister"
+        }
+      ],
+      "am": [
+        {
+          "num": "-",
+          "name": "Barcola"
+        },
+        {
+          "num": "-",
+          "name": "Wirtz"
+        },
+        {
+          "num": "20",
+          "name": "Gakpo"
+        }
+      ],
+      "fw": {
+        "num": "9",
+        "name": "Isak"
+      },
+      "bench": [
+        "Mamardashvili",
+        "Gomez",
+        "Tsimikas",
+        "Gravenberch",
+        "Chiesa",
+        "Ekitike"
+      ]
     }
   },
-
   "keyPlayer": {
-    "manchester-city": { "name": "Erling Haaland", "role": "Striker", "fact": "Premier League's outright top scorer, and has now found the net against all 25 different PL clubs he's faced." },
-    "liverpool":        { "name": "Alexander Isak",  "role": "Striker", "fact": "Liverpool's leading scorer this season and the man who won it at Bournemouth (57') last time out." }
+    "manchester-city": {
+      "name": "Erling Haaland",
+      "role": "Striker",
+      "fact": "Premier League's outright top scorer, and has now found the net against all 25 different PL clubs he's faced."
+    },
+    "liverpool": {
+      "name": "Alexander Isak",
+      "role": "Striker",
+      "fact": "Liverpool's leading scorer this season and the man who won it at Bournemouth (57') last time out."
+    }
   }
 }
