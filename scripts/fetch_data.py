@@ -13,12 +13,19 @@ What it does, in order:
      minute to get one, free, no card required). Falls back to scraping
      Wikipedia's season table if no key is set or the API request fails,
      so the widget still works out of the box with zero setup.
-  2. Fixtures: pulled from the same API — the next full unplayed
+  2. Top scorers: pulled from the same API — the single top scorer for
+     each club, used to auto-fill the "Key men" card whenever a fixture
+     doesn't have a hand-curated keyPlayer entry.
+  3. Fixtures: pulled from the same API — the next full unplayed
      matchday's fixtures (home/away/date/venue) for all 20 clubs, one
      entry per team, in the same shape the widget already expects. If no
      key is configured (or the request fails), the existing fixtures in
      data.json are left untouched rather than wiped.
-  3. Leaves "lineups" and "keyPlayer" alone. Confirmed lineups usually
+  4. Head-to-head: for each fixture in that matchday, pulled from the
+     API's per-match head2head endpoint and boiled down into the numbers
+     the widget's "bookie angle" cards use — H2H record, average goals,
+     BTTS rate, and the most recent meeting (a built-in "fun fact").
+  5. Leaves "lineups" and "keyPlayer" alone. Confirmed lineups usually
      only appear ~1 hour before kickoff, so scraping them reliably every
      2 days isn't realistic — curate those two blocks by hand, or wire
      up a lineups-capable API if you want them automated too.
@@ -41,6 +48,7 @@ import json
 import os
 import re
 import sys
+import time
 import unicodedata
 from datetime import datetime, timezone
 from io import StringIO
@@ -65,11 +73,30 @@ WIKIPEDIA_SEASON_URL = "https://en.wikipedia.org/wiki/2026%E2%80%9327_Premier_Le
 FOOTBALL_DATA_BASE = "https://api.football-data.org/v4"
 FOOTBALL_DATA_COMPETITION = "PL"
 FOOTBALL_DATA_API_KEY = os.environ.get("FOOTBALL_DATA_API_KEY", "").strip()
-
-# football-data.org free tier: 10 requests/minute once you have a token.
-# We make at most 2 calls per run (standings + matches), so this is never
-# close to the limit.
 FOOTBALL_DATA_TIMEOUT = 20
+
+# football-data.org free tier: 10 requests/minute. A full run now makes
+# standings(1) + scorers(1) + fixtures(1) + head-to-head(1 per fixture,
+# ~10) calls, so we throttle every call through this instead of trusting
+# each function to stay under the limit on its own.
+_MIN_CALL_INTERVAL = 6.5  # seconds
+_last_call_at = 0.0
+
+
+def _throttled_get(url: str, params: dict | None = None) -> requests.Response:
+    """requests.get(), but never firing more than ~9/minute at football-data.org."""
+    global _last_call_at
+    wait = _MIN_CALL_INTERVAL - (time.monotonic() - _last_call_at)
+    if wait > 0:
+        time.sleep(wait)
+    resp = requests.get(
+        url,
+        headers={"X-Auth-Token": FOOTBALL_DATA_API_KEY},
+        params=params,
+        timeout=FOOTBALL_DATA_TIMEOUT,
+    )
+    _last_call_at = time.monotonic()
+    return resp
 
 
 def slugify(name: str) -> str:
@@ -190,11 +217,7 @@ def fetch_standings_api() -> dict:
     if not FOOTBALL_DATA_API_KEY:
         return {}
     try:
-        resp = requests.get(
-            f"{FOOTBALL_DATA_BASE}/competitions/{FOOTBALL_DATA_COMPETITION}/standings",
-            headers={"X-Auth-Token": FOOTBALL_DATA_API_KEY},
-            timeout=FOOTBALL_DATA_TIMEOUT,
-        )
+        resp = _throttled_get(f"{FOOTBALL_DATA_BASE}/competitions/{FOOTBALL_DATA_COMPETITION}/standings")
         resp.raise_for_status()
         payload = resp.json()
     except requests.RequestException as e:
@@ -243,23 +266,121 @@ def fetch_standings() -> dict:
     return fetch_standings_wikipedia()
 
 
-def fetch_fixtures_api(teams: dict) -> dict:
+def fetch_scorers_api() -> dict:
     """
-    Pull the next full unplayed matchday's fixtures from football-data.org
-    and shape them into the same {slug: {opponent, home, date, venue,
-    competition, matchweek}} structure the widget already reads — one
-    entry per team, two entries per match. Returns {} (leaving whatever
-    fixtures data.json already has untouched) if no API key is set or the
-    request fails/returns nothing.
+    Pull the competition's top scorers from football-data.org and keep
+    just the single top scorer for each club (the scorers list is ranked
+    goals-descending, so the first entry seen per team is that team's top
+    scorer). Used to auto-fill the widget's "Key men" card when there's no
+    hand-curated keyPlayer entry for a team. Returns {} on no key/failure.
     """
     if not FOOTBALL_DATA_API_KEY:
         return {}
     try:
-        resp = requests.get(
+        resp = _throttled_get(
+            f"{FOOTBALL_DATA_BASE}/competitions/{FOOTBALL_DATA_COMPETITION}/scorers",
+            params={"limit": 100},
+        )
+        resp.raise_for_status()
+        payload = resp.json()
+    except requests.RequestException as e:
+        print(f"NOTE: football-data.org scorers request failed ({e}); skipping auto top-scorers.")
+        return {}
+
+    top_scorers = {}
+    for entry in payload.get("scorers", []):
+        team_name = (entry.get("team") or {}).get("name", "")
+        slug = slugify_club(team_name)
+        if not slug or slug in top_scorers:
+            continue  # already have this team's top scorer
+        player = entry.get("player") or {}
+        top_scorers[slug] = {
+            "name": player.get("name", "Unknown"),
+            "goals": entry.get("goals") or 0,
+            "assists": entry.get("assists") or 0,
+        }
+    return top_scorers
+
+
+def fetch_head_to_head_api(match_id: int) -> dict:
+    """
+    Pull head-to-head history for one fixture (by its football-data.org
+    match id) and boil it down into the numbers the widget's "bookie
+    angle" cards use: H2H record, average goals per meeting, BTTS rate,
+    and the most recent meeting (used as a built-in "fun fact"). The
+    aggregates' "homeTeam"/"awayTeam" refer to the current fixture's
+    home/away side, which is exactly how the widget keys everything else.
+    Returns {} on any failure or if the two sides have no history.
+    """
+    if not FOOTBALL_DATA_API_KEY:
+        return {}
+    try:
+        resp = _throttled_get(f"{FOOTBALL_DATA_BASE}/matches/{match_id}/head2head", params={"limit": 10})
+        resp.raise_for_status()
+        payload = resp.json()
+    except requests.RequestException as e:
+        print(f"NOTE: football-data.org head2head request failed for match {match_id} ({e}); skipping.")
+        return {}
+
+    agg = payload.get("aggregates") or {}
+    played = agg.get("numberOfMatches") or 0
+    if not played:
+        return {}
+
+    home_agg = agg.get("homeTeam") or {}
+    away_agg = agg.get("awayTeam") or {}
+    total_goals = agg.get("totalGoals") or 0
+
+    both_scored = 0
+    counted = 0
+    last_meeting = None
+    last_date = ""
+    for m in payload.get("matches") or []:
+        score = (m.get("score") or {}).get("fullTime") or {}
+        h, a = score.get("home"), score.get("away")
+        if h is None or a is None:
+            continue
+        counted += 1
+        if h > 0 and a > 0:
+            both_scored += 1
+        m_date = m.get("utcDate") or ""
+        if m_date > last_date:
+            last_date = m_date
+            last_meeting = {
+                "date": m_date,
+                "home": (m.get("homeTeam") or {}).get("name", ""),
+                "away": (m.get("awayTeam") or {}).get("name", ""),
+                "homeScore": h,
+                "awayScore": a,
+                "competition": (m.get("competition") or {}).get("name", ""),
+            }
+
+    return {
+        "played": played,
+        "homeWins": home_agg.get("wins", 0),
+        "draws": home_agg.get("draws", 0),
+        "awayWins": away_agg.get("wins", 0),
+        "avgGoals": round(total_goals / played, 1) if played else None,
+        "bttsPct": round(both_scored / counted * 100) if counted else None,
+        "lastMeeting": last_meeting,
+    }
+
+
+def fetch_fixtures_api(teams: dict) -> dict:
+    """
+    Pull the next full unplayed matchday's fixtures from football-data.org
+    and shape them into the same {slug: {opponent, home, date, venue,
+    competition, matchweek, matchId}} structure the widget already reads —
+    one entry per team, two entries per match. Returns {} (leaving
+    whatever fixtures data.json already has untouched) if no API key is
+    set or the request fails/returns nothing.
+    """
+    if not FOOTBALL_DATA_API_KEY:
+        return {}
+    try:
+        resp = _throttled_get(
             f"{FOOTBALL_DATA_BASE}/competitions/{FOOTBALL_DATA_COMPETITION}/matches",
-            headers={"X-Auth-Token": FOOTBALL_DATA_API_KEY},
             params={"status": "SCHEDULED"},
-            timeout=FOOTBALL_DATA_TIMEOUT,
         )
         resp.raise_for_status()
         payload = resp.json()
@@ -292,11 +413,35 @@ def fetch_fixtures_api(teams: dict) -> dict:
             "venue": venue,
             "competition": "Premier League",
             "matchweek": next_matchday,
+            "matchId": m.get("id"),
         }
         fixtures[home_slug] = {"opponent": away_slug, "home": True, **common}
         fixtures[away_slug] = {"opponent": home_slug, "home": False, **common}
 
     return fixtures
+
+
+def fetch_all_head_to_head(fixtures: dict) -> dict:
+    """
+    Call fetch_head_to_head_api() once per fixture in `fixtures` (not once
+    per team — fixtures has two entries per match) and key the results by
+    the home team's slug, same as `fixtures` itself.
+    """
+    if not FOOTBALL_DATA_API_KEY:
+        return {}
+    head_to_head = {}
+    seen_match_ids = set()
+    for slug, fx in fixtures.items():
+        if not fx.get("home"):
+            continue
+        match_id = fx.get("matchId")
+        if not match_id or match_id in seen_match_ids:
+            continue
+        seen_match_ids.add(match_id)
+        h2h = fetch_head_to_head_api(match_id)
+        if h2h:
+            head_to_head[slug] = h2h
+    return head_to_head
 
 
 def main():
@@ -323,22 +468,37 @@ def main():
     if unknown:
         print(f"NOTE: standings source listed teams not in teams.json (add them if real): {unknown}")
 
+    print("Fetching top scorers…")
+    top_scorers = fetch_scorers_api()
+    if top_scorers:
+        print(f"Fetched top scorers for {len(top_scorers)} clubs from football-data.org.")
+    else:
+        top_scorers = existing.get("topScorers", {})
+
     print("Fetching fixtures…")
     api_fixtures = fetch_fixtures_api(teams)
     if api_fixtures:
         sample_mw = next(iter(api_fixtures.values()))["matchweek"]
         print(f"Fetched {len(api_fixtures) // 2} fixtures from football-data.org (matchday {sample_mw}).")
         fixtures = api_fixtures
+
+        print("Fetching head-to-head history for each fixture (paced to respect the API's rate limit)…")
+        head_to_head = fetch_all_head_to_head(api_fixtures)
+        if head_to_head:
+            print(f"Fetched head-to-head history for {len(head_to_head)} fixture(s).")
     else:
         if not FOOTBALL_DATA_API_KEY:
             print("No FOOTBALL_DATA_API_KEY configured — leaving fixtures unchanged. See README to set one up.")
         fixtures = existing.get("fixtures", {})
+        head_to_head = existing.get("headToHead", {})
 
     result = {
         "_readme": existing.get("_readme", "Auto-refreshed by scripts/fetch_data.py."),
         "generatedAt": datetime.now(timezone.utc).isoformat(),
         "standings": standings,
         "fixtures": fixtures,
+        "headToHead": head_to_head,
+        "topScorers": top_scorers,
         "lineups": existing.get("lineups", {}),
         "keyPlayer": existing.get("keyPlayer", {}),
     }
