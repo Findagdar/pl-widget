@@ -91,7 +91,8 @@
 <div class="wrap">
   <header class="top">
     <h1>Upcoming Premier League matchday widgets</h1>
-    <p>One widget per fixture, ordered by kickoff time. Tap a match to expand it.</p>
+    <p>One widget per fixture, ordered by kickoff time. Tap a match to expand it.
+      Kickoff times shown are automatically converted to your device's local time zone.</p>
   </header>
   <div class="controls">
     <button id="expandAll" type="button">Expand all</button>
@@ -113,7 +114,7 @@
     return d.toLocaleDateString(undefined, { weekday:'long', month:'short', day:'numeric' });
   }
   function fmtTime(d){
-    return d.toLocaleTimeString(undefined, { hour:'2-digit', minute:'2-digit' });
+    return d.toLocaleTimeString(undefined, { hour:'2-digit', minute:'2-digit', timeZoneName:'short' });
   }
 
   async function main(){
