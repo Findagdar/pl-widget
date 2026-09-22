@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PL Matchday Widgets — Upcoming Fixtures</title>
+<style>
+  :root{
+    color-scheme: light dark;
+    --bg:#F3F6F9; --surface:#FFFFFF; --surface-2:#ECF1F6; --border:#D9E1E9;
+    --text:#101820; --text-dim:#5B6B78;
+    --accent:#1868A6;
+    --gold:#9A6A0C;
+    --shadow:0 1px 2px rgba(16,24,32,.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0A1420; --surface:#101C2B; --surface-2:#152437; --border:#213348;
+      --text:#EAF1F8; --text-dim:#8BA0B4;
+      --accent:#5FA8DE;
+      --gold:#E7B24C;
+      --shadow:0 1px 2px rgba(0,0,0,.4);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0A1420; --surface:#101C2B; --surface-2:#152437; --border:#213348;
+    --text:#EAF1F8; --text-dim:#8BA0B4;
+    --accent:#5FA8DE;
+    --gold:#E7B24C;
+    --shadow:0 1px 2px rgba(0,0,0,.4);
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{ background:var(--bg); color:var(--text); font-family:"Manrope",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+  h1,.day-heading,.num{ font-family:"Barlow Condensed","Manrope",sans-serif; }
+  [hidden]{ display:none!important; }
+
+  .wrap{ max-width:820px; margin:0 auto; padding:18px 16px 40px; }
+  header.top{ margin-bottom:18px; }
+  header.top h1{ font-size:26px; font-weight:800; margin:0 0 4px; letter-spacing:-.01em; }
+  header.top p{ margin:0; color:var(--text-dim); font-size:13px; }
+
+  .day-heading{
+    font-size:15px; font-weight:800; text-transform:uppercase; letter-spacing:.06em;
+    color:var(--accent); margin:28px 0 10px; padding-bottom:6px; border-bottom:1px solid var(--border);
+  }
+  .day-heading:first-of-type{ margin-top:8px; }
+
+  .match-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    box-shadow:var(--shadow); margin-bottom:18px; overflow:hidden;
+  }
+  .match-card summary{
+    list-style:none; cursor:pointer; display:flex; align-items:center; gap:12px;
+    padding:12px 14px; user-select:none;
+  }
+  .match-card summary::-webkit-details-marker{ display:none; }
+  .match-card .kickoff{
+    font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:15px;
+    color:var(--text); min-width:56px; text-align:center; line-height:1.15;
+  }
+  .match-card .kickoff .tz{ display:block; font-size:9px; font-weight:600; color:var(--text-dim); text-transform:uppercase; letter-spacing:.04em; }
+  .match-card .teams{ flex:1; display:flex; align-items:center; gap:8px; min-width:0; font-weight:700; font-size:14px; }
+  .match-card .teams .crest{ width:22px; height:22px; border-radius:50%; flex-shrink:0; box-shadow:var(--shadow); }
+  .match-card .teams .nm{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .match-card .teams .vs{ color:var(--text-dim); font-weight:600; font-size:12px; flex-shrink:0; }
+  .match-card .venue{ color:var(--text-dim); font-size:11px; flex-shrink:0; display:none; }
+  @media (min-width:560px){ .match-card .venue{ display:block; } }
+  .match-card .chev{ color:var(--text-dim); font-size:12px; flex-shrink:0; transition:transform .15s ease; }
+  .match-card[open] .chev{ transform:rotate(180deg); }
+  .match-card a.openlink{ color:var(--accent); font-size:11px; text-decoration:none; flex-shrink:0; white-space:nowrap; }
+  .match-card a.openlink:hover{ text-decoration:underline; }
+
+  .frame-wrap{ border-top:1px solid var(--border); background:var(--surface-2); }
+  iframe.widget-frame{ display:block; width:100%; border:0; }
+
+  .controls{
+    display:flex; gap:8px; flex-wrap:wrap; margin-bottom:6px;
+  }
+  .controls button{
+    font:inherit; font-size:11px; font-weight:700; padding:6px 11px; border-radius:8px;
+    border:1px solid var(--border); background:var(--surface); color:var(--text); cursor:pointer;
+  }
+  .controls button:hover{ border-color:var(--accent); }
+
+  footer{ text-align:center; font-size:11px; color:var(--text-dim); margin-top:26px; }
+  .err{ background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px; color:var(--text-dim); font-size:13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>Upcoming Premier League matchday widgets</h1>
+    <p>One widget per fixture, ordered by kickoff time. Tap a match to expand it.</p>
+  </header>
+  <div class="controls">
+    <button id="expandAll" type="button">Expand all</button>
+    <button id="collapseAll" type="button">Collapse all</button>
+  </div>
+  <div id="list"><div class="err">Loading fixtures…</div></div>
+  <footer id="footNote"></footer>
+</div>
+
+<script>
+  const params = new URLSearchParams(location.search);
+  const theme = params.get('theme');
+  if (theme === 'dark' || theme === 'light') document.documentElement.setAttribute('data-theme', theme);
+  const density = params.get('density') || 'compact';
+
+  function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  function fmtDay(d){
+    return d.toLocaleDateString(undefined, { weekday:'long', month:'short', day:'numeric' });
+  }
+  function fmtTime(d){
+    return d.toLocaleTimeString(undefined, { hour:'2-digit', minute:'2-digit' });
+  }
+
+  async function main(){
+    const list = document.getElementById('list');
+    let teams, data;
+    try {
+      [teams, data] = await Promise.all([
+        fetch('./teams.json').then(r => { if(!r.ok) throw new Error('teams.json ' + r.status); return r.json(); }),
+        fetch('./data.json').then(r => { if(!r.ok) throw new Error('data.json ' + r.status); return r.json(); }),
+      ]);
+    } catch (e) {
+      list.innerHTML = `<div class="err">Couldn't load fixture data (${esc(e.message)}). Make sure teams.json and data.json are served next to this page.</div>`;
+      return;
+    }
+
+    // Each match appears twice in data.fixtures (once per team) — take the
+    // "home: true" side once per match to get one row per fixture.
+    const matches = Object.entries(data.fixtures || {})
+      .filter(([, fx]) => fx && fx.home)
+      .map(([homeSlug, fx]) => ({ homeSlug, awaySlug: fx.opponent, date: fx.date, venue: fx.venue, matchweek: fx.matchweek }))
+      .filter(m => m.date && teams[m.homeSlug] && teams[m.awaySlug])
+      .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    if (!matches.length) {
+      list.innerHTML = `<div class="err">No upcoming fixtures found in data.json yet.</div>`;
+      return;
+    }
+
+    let html = '';
+    let lastDay = null;
+    matches.forEach((m, i) => {
+      const d = new Date(m.date);
+      const dayKey = d.toDateString();
+      if (dayKey !== lastDay) {
+        html += `<div class="day-heading">${esc(fmtDay(d))}</div>`;
+        lastDay = dayKey;
+      }
+      const home = teams[m.homeSlug], away = teams[m.awaySlug];
+      const src = `index.html?home=${encodeURIComponent(m.homeSlug)}&away=${encodeURIComponent(m.awaySlug)}&density=${encodeURIComponent(density)}${theme ? '&theme=' + encodeURIComponent(theme) : ''}`;
+      html += `
+        <details class="match-card" data-idx="${i}">
+          <summary>
+            <div class="kickoff">${esc(fmtTime(d))}</div>
+            <div class="teams">
+              <span class="crest" style="background:${esc(home.primary)}"></span>
+              <span class="nm">${esc(home.short)}</span>
+              <span class="vs">vs</span>
+              <span class="crest" style="background:${esc(away.primary)}"></span>
+              <span class="nm">${esc(away.short)}</span>
+            </div>
+            <div class="venue">${esc(m.venue || '')}</div>
+            <a class="openlink" href="${src}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Open ↗</a>
+            <span class="chev">▾</span>
+          </summary>
+          <div class="frame-wrap">
+            <iframe class="widget-frame" data-idx="${i}" src="${src}" height="640" loading="lazy" title="${esc(home.name)} vs ${esc(away.name)} matchday widget"></iframe>
+          </div>
+        </details>`;
+    });
+    list.innerHTML = html;
+
+    document.getElementById('footNote').textContent =
+      `${matches.length} fixtures · data refreshed ${new Date(data.generatedAt).toLocaleString()}`;
+
+    // Auto-resize each iframe from its own postMessage, matched by source window.
+    const frames = Array.from(document.querySelectorAll('iframe.widget-frame'));
+    window.addEventListener('message', (e) => {
+      if (e.data && e.data.type === 'pl-widget-resize') {
+        const frame = frames.find(f => f.contentWindow === e.source);
+        if (frame) frame.style.height = e.data.height + 'px';
+      }
+    });
+
+    document.getElementById('expandAll').addEventListener('click', () => {
+      document.querySelectorAll('.match-card').forEach(d => d.open = true);
+    });
+    document.getElementById('collapseAll').addEventListener('click', () => {
+      document.querySelectorAll('.match-card').forEach(d => d.open = false);
+    });
+
+    // Open the first (soonest) fixture by default.
+    const first = document.querySelector('.match-card');
+    if (first) first.open = true;
+  }
+
+  main();
+</script>
+</body>
+</html>
