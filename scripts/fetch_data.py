@@ -37,6 +37,7 @@ import re
 import sys
 import unicodedata
 from datetime import datetime, timezone
+from io import StringIO
 from pathlib import Path
 
 import requests
@@ -81,7 +82,11 @@ def fetch_standings() -> dict:
 
     resp = requests.get(WIKIPEDIA_SEASON_URL, headers=HEADERS, timeout=20)
     resp.raise_for_status()
-    tables = pd.read_html(resp.text)
+    # Wrap in StringIO: passing a raw string directly to pd.read_html() can
+    # make lxml try to treat it as a filename/URL instead of HTML content
+    # (raises "OSError: Error reading file '<!DOCTYPE html>...'" on some
+    # pandas/lxml versions) rather than parsing it as markup.
+    tables = pd.read_html(StringIO(resp.text))
 
     # The league table is the first wide table with a "Pts" column and 20 rows.
     table = None
