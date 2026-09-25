@@ -1,6 +1,6 @@
 {
   "_readme": "SEED/EXAMPLE data so the widget renders out of the box. Standings are refreshed automatically (see generatedAt) by scripts/fetch_data.py on a schedule. 'fixtures' holds the full Matchweek 6 round (10-12 Oct 2026), one entry per team, curated by hand since fetch_fixtures() is still a stub — see README. Fields left out for a team (lineup/keyPlayer) make the widget fall back to a placeholder instead of guessing.",
-  "generatedAt": "2026-09-23T11:04:06.819364+00:00",
+  "generatedAt": "2026-09-25T11:27:50.537275+00:00",
   "standings": {
     "manchester-city": {
       "pos": 1,
